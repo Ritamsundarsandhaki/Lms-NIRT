@@ -1,0 +1,19 @@
+/* Global Styles */
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	font-family: "Arial", sans-serif;
+}
+:root {
+	--primary-bg: #021e73;
+	--secondary-bg: #0e1f40;
+	--primary-accent: #578bf2;
+	--secondary-accent: #91b2f2;
+	--text-light: #ffffffe5;
+	--text-dark: #111;
+}
+
+
+
+
