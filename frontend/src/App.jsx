@@ -7,7 +7,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import Unauthorized from "./pages/open/Unauthorized";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import Aboutus from "./pages/open/Aboutus";
-import FacultyDashboard from "./pages/faculty/FacultyDashboard"
+import FacultyDashboard from "./pages/faculty/FacultyDashboard";
 
 // ✅ Protected Route Component
 const ProtectedRoute = ({ allowedRoles }) => {
