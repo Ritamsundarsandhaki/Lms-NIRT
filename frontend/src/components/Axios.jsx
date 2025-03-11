@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:1407'; // ✅ No dotenv.config()
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: BASE_URL,
     withCredentials: true,
   headers: {
     "Content-Type": "application/json",

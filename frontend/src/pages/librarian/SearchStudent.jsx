@@ -24,7 +24,7 @@ const SearchStudent = () => {
       if (name) params.name = name;
       if (fileNo) params.fileNo = fileNo;
       if (!name && !fileNo) {
-        setMessage("⚠️ Provide either File No or Name to search");
+        setMessage(" Provide either File No or Name to search");
         setLoading(false);
         return;
       }
@@ -37,7 +37,7 @@ const SearchStudent = () => {
         setTotalPages(response.data.pagination.totalPages);
       }
     } catch (error) {
-      setMessage("⚠️ Error fetching students. Try again later.");
+      setMessage("No student Found");
     }
     setLoading(false);
   };

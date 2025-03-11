@@ -97,14 +97,6 @@ export const getIssuedBooks = async (req, res) => {
       .filter((book) => !book.returned)
       .map((book) => {
         let fine = 0;
-        const dueDate = new Date(book.issueDate);
-        dueDate.setDate(dueDate.getDate() + 30); // Due in 30 days for faculty
-
-        const today = new Date();
-        if (today > dueDate) {
-          const overdueDays = Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24));
-          fine = overdueDays * 5; // Rs. 5 per day fine
-        }
 
         return {
           bookId: book,

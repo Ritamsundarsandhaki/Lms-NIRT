@@ -7,6 +7,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import Unauthorized from "./pages/open/Unauthorized";
 import { AuthProvider, useAuth } from "./components/AuthContext";
 import Aboutus from "./pages/open/Aboutus";
+import FacultyDashboard from "./pages/faculty/facultyDashboard";
 
 // ✅ Protected Route Component
 const ProtectedRoute = ({ allowedRoles }) => {
@@ -42,6 +43,11 @@ const App = () => {
           <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
             <Route path="/student/*" element={<StudentDashboard />} />
           </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={["faculty"]} />}>
+            <Route path="/faculty/*" element={<FacultyDashboard/>} />
+          </Route>
+         
 
 
         </Routes>

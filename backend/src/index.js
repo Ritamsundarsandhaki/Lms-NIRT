@@ -12,7 +12,8 @@ import facuityRouter from './routes/faculty.routes.js';
 import authRouter from './routes/auth.routes.js';
 import Admin from "./models/admin.model.js"; // Import Admin model
 import morgan from "morgan"; 
-dotenv.config({ path: "./src/.env" });
+dotenv.config();
+// { path: "./src/.env" }
 
 const app = express();
 
@@ -39,7 +40,7 @@ app.get("/", (req, res) => {
 app.use("/api/admin", adminRouter);
 app.use("/api/librarian", librarianRouter);
 app.use("/api/student", studentRouter);
-app.use('/api/faculity',facuityRouter)
+app.use('/api/faculty',facuityRouter)
 app.use('/auth/',authRouter);
 
 // ✅ Error Handling Middleware

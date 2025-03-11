@@ -41,7 +41,7 @@ const SearchBook = () => {
         setBooks([]);
       }
     } catch (error) {
-      setMessage("⚠️ Error fetching books.");
+      setMessage("No books found.");
     }
 
     setLoading(false);
@@ -62,7 +62,7 @@ const SearchBook = () => {
         setBooks([]);
       }
     } catch (error) {
-      setMessage("⚠️ Error fetching books.");
+      setMessage("Not Books Found");
     }
 
     setLoading(false);
@@ -93,6 +93,7 @@ const SearchBook = () => {
               <p className="text-gray-600">💰 <strong>Price:</strong> ₹{book.price}</p>
               <p className="text-gray-600">📄 <strong>Details:</strong> {book.details}</p>
               <button onClick={() => setSelectedBook(book)} className="mt-4 text-blue-500 font-semibold underline hover:text-blue-700 transition">Show Copies</button>
+              <button>Downlode QR code</button>
             </div>
           ))}
         </div>
