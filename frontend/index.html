@@ -1,10 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+
+    <!-- SEO Meta Tags -->
+    <title>NIRT Library - College Library Management System</title>
+    <meta name="description" content="NIRT Library is a college library management system for the NRI Group of Institutes, providing an easy way to search and manage books." />
+    <meta name="keywords" content="NIRT Library, college library, library management system, NRI Group of Institutes, book catalog, online library" />
+    <meta name="author" content="NIRT Library Team" />
+
+    <!-- Open Graph (OG) for Social Media -->
+    <meta property="og:title" content="NIRT Library - College Library Management System" />
+    <meta property="og:description" content="NIRT Library helps students and faculty manage books efficiently with a digital library system." />
+    <meta property="og:image" content="https://nirtlibrary.in/preview-image.jpg" />
+    <meta property="og:url" content="https://nirtlibrary.in/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Favicon (NIRT Library Logo) -->
+    <link rel="icon" type="image/png" href="./src/assets/nrilogo.png" />
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://nirtlibrary.in/" />
+
+    <!-- Structured Data (JSON-LD for Library) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Library",
+        "name": "NIRT Library",
+        "url": "https://nirtlibrary.in/",
+        "logo": "https://nirtlibrary.in/logo.png",
+        "description": "NIRT Library is a digital library management system for the NRI Group of Institutes.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "NRI Group of Institutes",
+          "addressLocality": "Bhopal",
+          "addressRegion": "MP",
+          "postalCode": "462020",
+          "addressCountry": "IN"
+        }
+      }
+    </script>
+
   </head>
   <body>
     <div id="root"></div>

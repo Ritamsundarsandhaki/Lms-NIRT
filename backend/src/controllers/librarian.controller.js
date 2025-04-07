@@ -6,6 +6,9 @@ import Librarian from "../models/librarian.model.js";
 import Book from "../models/book.models.js";
 import Faculty from "../models/faculty.model.js";
 import mongoose from "mongoose";
+import { fileURLToPath } from "url";
+import path from 'path'
+import fs from 'fs'
 import xlsx from "xlsx";
 
 /**
@@ -304,16 +307,70 @@ export const uploadStudents = async (req, res) => {
  * @desc Register a new book
  * @route POST /librarian/register-book
  */
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ID_FILE_PATH = path.join(__dirname, "lastBookId.json");
+
+// Function to read last stored ID
+const getLastBookId = () => {
+  try {
+    if (fs.existsSync(ID_FILE_PATH)) {
+      const data = fs.readFileSync(ID_FILE_PATH, "utf8");
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error("Error reading last book ID file:", error);
+  }
+  return { prefix: "AA", number: 0 }; // Default start
+};
+
+// Function to save the last generated ID
+const saveLastBookId = (lastId) => {
+  try {
+    fs.writeFileSync(ID_FILE_PATH, JSON.stringify(lastId, null, 2), "utf8");
+  } catch (error) {
+    console.error("Error writing last book ID file:", error);
+  }
+};
+
+// Function to generate the next unique ID
+const generateNextBookId = () => {
+  let { prefix, number } = getLastBookId();
+
+  number++; // Increment the number part
+  if (number > 999999) {
+    number = 0; // Reset number part
+    prefix = nextLetterPrefix(prefix); // Increment letters
+  }
+
+  const newBookId = `${prefix}-${number.toString().padStart(6, "0")}`;
+  saveLastBookId({ prefix, number });
+
+  return newBookId;
+};
+
+// Helper function to increment letter prefix (AA → AB → ... → ZZ)
+const nextLetterPrefix = (prefix) => {
+  let chars = prefix.split("");
+  if (chars[1] === "Z") {
+    chars[1] = "A";
+    chars[0] = String.fromCharCode(chars[0].charCodeAt(0) + 1);
+  } else {
+    chars[1] = String.fromCharCode(chars[1].charCodeAt(0) + 1);
+  }
+  return chars.join("");
+};
+
+// Main book registration controller
 export const registerBook = async (req, res) => {
   try {
     const { title, author, details, stock, price, course, branch } = req.body;
 
-    // Validate input fields
     if (!title || !author || !details || !stock || !price || !course || !branch) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
-    // Validate stock and price
     if (isNaN(stock) || stock <= 0 || parseInt(stock) !== Number(stock)) {
       return res.status(400).json({ success: false, message: "Stock must be a positive integer" });
     }
@@ -321,35 +378,21 @@ export const registerBook = async (req, res) => {
       return res.status(400).json({ success: false, message: "Price must be a positive number" });
     }
 
-    // Generate unique book IDs
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const bookIdSet = new Set();
     const books = [];
-
-    while (bookIdSet.size < stock) {
-      const randomLetter1 = letters[Math.floor(Math.random() * letters.length)];
-      const randomLetter2 = letters[Math.floor(Math.random() * letters.length)];
-      const randomNumber = Math.floor(1000 + Math.random() * 9000); // 4-digit number (1000-9999)
-      const newBookId = `${randomLetter1}${randomLetter2}${randomNumber}`;
-
-      // Ensure uniqueness within the current batch
-      if (!bookIdSet.has(newBookId)) {
-        bookIdSet.add(newBookId);
-        books.push({
-          bookId: newBookId,
-          title,
-          author,
-          details,
-          price,
-          course,
-          branch,
-          issued: false,
-        });
-      }
+    for (let i = 0; i < stock; i++) {
+      books.push({
+        bookId: generateNextBookId(),
+        title,
+        author,
+        details,
+        price,
+        course,
+        branch,
+        issued: false,
+      });
     }
 
-    // Insert into database
-    const book = new Book({ title, details, stock, price, course, branch, books,author });
+    const book = new Book({ title, details, stock, price, course, branch, books, author });
     await book.save();
 
     res.status(201).json({ success: true, message: "Book registered successfully", book });
@@ -358,7 +401,6 @@ export const registerBook = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
-
 
 
 

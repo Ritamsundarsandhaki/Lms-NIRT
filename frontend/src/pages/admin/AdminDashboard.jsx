@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../../components/Axios";  // Ensure you are using Axios instance
+import axiosInstance from "../../components/Axios";
 import AdminSidebar from "./Adminsidebar";
 import RegisterLibrarian from "./Register_libarian";
 import AdminAllLibrarians from "./Admin_alllibarian";
@@ -11,10 +11,9 @@ import AdminAllFaculty from "./Admin_allfeclty";
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "dark");
   const [greeting, setGreeting] = useState("");
   const location = useLocation();
-  const navigate = useNavigate(); // Use for redirection
+  const navigate = useNavigate();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -22,17 +21,11 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("theme", darkMode ? "dark" : "light");
-    document.documentElement.classList.toggle("dark", darkMode);
-  }, [darkMode]);
-
-  // Handle 402 response globally
-  useEffect(() => {
     const responseInterceptor = axiosInstance.interceptors.response.use(
-      (response) => response, 
+      (response) => response,
       (error) => {
         if (error.response && error.response.status === 401) {
-          navigate("/login"); // Redirect to home page
+          navigate("/login");
         }
         return Promise.reject(error);
       }
@@ -46,7 +39,7 @@ const AdminDashboard = () => {
   const isDashboard = location.pathname === "/admin/dashboard";
 
   return (
-    <div className={`flex min-h-screen transition-all duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
+    <div className="flex min-h-screen bg-gray-50 text-gray-900 transition-all duration-300">
       
       {/* Sidebar Toggle for Mobile */}
       <button
@@ -66,9 +59,9 @@ const AdminDashboard = () => {
         {/* Dashboard Overview */}
         {isDashboard && (
           <>
-            <div className="mb-6 p-6 bg-white dark:bg-gray-800 shadow-lg rounded-2xl flex flex-col items-center">
+            <div className="mb-6 p-6 bg-white shadow-lg rounded-2xl flex flex-col items-center">
               <h1 className="text-3xl font-bold">{greeting}, Admin! 👋</h1>
-              <p className="text-lg mt-2 text-gray-600 dark:text-gray-300">Manage your library system efficiently.</p>
+              <p className="text-lg mt-2 text-gray-600">Manage your library system efficiently.</p>
             </div>
 
             {/* Quick Actions */}
@@ -81,19 +74,12 @@ const AdminDashboard = () => {
           </>
         )}
 
-        {/* Dark Mode Toggle */}
-        <div className="flex justify-end mb-6">
-          <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-md bg-gray-700 text-white hover:bg-gray-600 transition">
-            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-          </button>
-        </div>
-
         {/* Routes for Pages */}
         {!isDashboard && (
-          <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
+          <div className="bg-white shadow-lg rounded-2xl p-6">
             <Routes>
               <Route path="register-librarian" element={<RegisterLibrarian />} />
-              <Route path="register-faculty" element={<Admin_registerFeclty  />} />
+              <Route path="register-faculty" element={<Admin_registerFeclty />} />
               <Route path="all-librarians" element={<AdminAllLibrarians />} />
               <Route path="all-students" element={<AdminAllStudents />} />
               <Route path="all-faculty" element={<AdminAllFaculty />} />
@@ -106,7 +92,7 @@ const AdminDashboard = () => {
   );
 };
 
-// 📌 **Quick Action Card Component**
+// 📌 Quick Action Card Component
 const QuickActionCard = ({ title, link, color }) => (
   <Link to={link} className={`p-5 rounded-xl shadow-md text-white text-center text-lg font-medium hover:scale-105 transition transform duration-200 ${color}`}>
     {title}
