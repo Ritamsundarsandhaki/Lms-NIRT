@@ -454,7 +454,7 @@ const Home = () => {
                 1, Sajjan Singh Nagar, Opposite Patel Nagar,Raisen Road Bhopal
               </p>
               <p className="text-lg opacity-80 mb-4">
-                Email: info@nirtlibrary.com
+                Email: info@nirtlibrary.in
               </p>
               <p className="text-lg opacity-80">Phone:0755-2529059</p>
             </div>
@@ -466,7 +466,7 @@ const Home = () => {
               &copy; 2025 NIRT Library. All rights reserved.
             </p>
             <p className="text-lg text-amber-50 opacity-80 flex gap-2">
-              Made with <FaHeart color="red" /> by Ritam Sundar Sandakhi
+              Made with <FaHeart color="red" /> by Ritam Sundar Sandhaki
             </p>
           </div>
         </div>
