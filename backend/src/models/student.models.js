@@ -32,6 +32,13 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    resetOtpCount: {
+      type: Number,
+      default: 0,
+    },
+    resetOtpDate: {
+      type: Date,
+    },    
     branch: {
       type: String,
       required: true,

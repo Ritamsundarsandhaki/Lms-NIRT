@@ -202,6 +202,52 @@ export const registerStudent = async (req, res) => {
 };
 
 
+export const updateStudentProfile = async (req, res) => {
+  try {
+    
+    const { name, email, parentName, department, branch,fileNo } = req.body;
+
+    // Check required fields
+    if (!fileNo) {
+      return res.status(400).json({ success: false, message: "Student ID is required" });
+    }
+
+    // Validate email if it's provided
+    if (email && !validator.isEmail(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+
+    // Validate branch if it's provided
+    const allowedBranches = ["CSE", "ECE", "EE", "Cyber", "Mining", "ME", "Automobile", "Civil"];
+    if (branch && !allowedBranches.includes(branch)) {
+      return res.status(400).json({
+        success: false,
+        message: `Branch must be one of: ${allowedBranches.join(", ")}`,
+      });
+    }
+
+    // Find the student
+    const student = await Student.findById(fileNo);
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    // Update only the allowed fields
+    if (name) student.name = name;
+    if (email) student.email = email;
+    if (parentName) student.parentName = parentName;
+    if (department) student.department = department;
+    if (branch) student.branch = branch;
+
+    await student.save();
+
+    res.status(200).json({ success: true, message: "Student profile updated successfully", student });
+  } catch (error) {
+    console.error("Error updating student:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
 
 
 

@@ -29,10 +29,27 @@ export const forgotPassword = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    // Check if the user has already requested OTP 2 times today
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    if (!user.resetOtpDate || user.resetOtpDate < startOfToday) {
+      user.resetOtpCount = 0; // reset if it's a new day
+      user.resetOtpDate = now;
+    }
+
+    if (user.resetOtpCount >= 2) {
+      return res.status(429).json({
+        success: false,
+        message: "OTP request limit exceeded. Try again tomorrow.",
+      });
+    }
+
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetOtp = otp;
     user.otpExpiry = Date.now() + 10 * 60 * 1000; // OTP valid for 10 mins
+    user.resetOtpCount += 1;
     await user.save();
 
     // Send OTP email
@@ -46,6 +63,7 @@ export const forgotPassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
+
 
 /**
  * @desc Verify OTP and Reset Password

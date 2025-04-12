@@ -29,7 +29,15 @@ const facultySchema = new mongoose.Schema(
       required: true,
     },
     resetOtp: { type: String }, // OTP for password reset
-  otpExpiry: { type: Date }, 
+  otpExpiry: { type: Date },
+  resetOtpCount: {
+    type: Number,
+    default: 0,
+  },
+  resetOtpDate: {
+    type: Date,
+  },
+  
     issuedBooks: [
       {
         bookId: { type: String, required: true },

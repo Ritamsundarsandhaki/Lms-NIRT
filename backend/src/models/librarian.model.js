@@ -11,6 +11,14 @@ const librarianSchema = new mongoose.Schema({
   isApproved: { type: Boolean, default: false }, // Admin approval status
   resetOtp: { type: String }, // OTP for password reset
   otpExpiry: { type: Date }, 
+  resetOtpCount: {
+    type: Number,
+    default: 0,
+  },
+  resetOtpDate: {
+    type: Date,
+  },
+  
   // ✅ History of actions
   history: [
     {
