@@ -2,17 +2,18 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Users, UserPlus, ClipboardList, Server, LogOut } from "lucide-react";
 import axiosInstance from "../../components/Axios";
+import { useAuth } from "../../components/AuthContext";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
+  const { logout } = useAuth();
   const location = useLocation(); // Get current route
   const navigate = useNavigate(); // For navigation
 
   // Logout function
   const handleLogout = async () => {
     try {
-      await axiosInstance.post("/api/admin/logout");
-      localStorage.removeItem("adminToken"); // Clear stored token if any
-      navigate("/"); // Redirect to home page
+      await axiosInstance.post("/api/auth/logout");
+      logout();
     } catch (error) {
       console.error("Logout failed:", error.response?.data?.message || "Server error");
     }

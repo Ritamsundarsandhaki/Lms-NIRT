@@ -11,6 +11,14 @@ const librarianSchema = new mongoose.Schema({
   isApproved: { type: Boolean, default: false }, // Admin approval status
   resetOtp: { type: String }, // OTP for password reset
   otpExpiry: { type: Date }, 
+  resetOtpCount: {
+    type: Number,
+    default: 0,
+  },
+  resetOtpDate: {
+    type: Date,
+  },
+  
   // ✅ History of actions
   history: [
     {
@@ -21,13 +29,6 @@ const librarianSchema = new mongoose.Schema({
   ],
 }, { timestamps: true });
 
-// ✅ Hash password before saving
-librarianSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
 
 // ✅ Compare passwords for login
 librarianSchema.methods.matchPassword = async function (enteredPassword) {

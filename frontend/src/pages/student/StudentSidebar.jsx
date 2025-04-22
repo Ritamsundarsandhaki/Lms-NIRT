@@ -1,15 +1,16 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axiosInstance from "../../components/Axios";
-
+import { useAuth } from "../../components/AuthContext";
 const StudentSidebar = ({ isOpen, toggleSidebar }) => {
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.post("/api/student/logout");
+      const response = await axiosInstance.post("/api/auth/logout");
       if (response.status === 200) {
-        navigate("/");
+        logout();
       }
     } catch (error) {
       console.error("Logout failed", error);

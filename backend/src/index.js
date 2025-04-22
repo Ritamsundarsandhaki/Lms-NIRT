@@ -41,7 +41,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api/librarian", librarianRouter);
 app.use("/api/student", studentRouter);
 app.use('/api/faculty',facuityRouter)
-app.use('/auth/',authRouter);
+app.use('/api/auth',authRouter);
 
 // ✅ Error Handling Middleware
 app.use((err, req, res, next) => {

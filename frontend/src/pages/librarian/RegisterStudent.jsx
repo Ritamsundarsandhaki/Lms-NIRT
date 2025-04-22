@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../../components/Axios"; // Import the Axios instance
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const RegisterStudent = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,6 @@ const RegisterStudent = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [message, setMessage] = useState({ type: "", text: "" });
   const [loading, setLoading] = useState(false);
 
   const branches = ["CSE", "ECE", "EE", "Cyber", "Mining", "ME", "Automobile", "Civil"];
@@ -47,7 +47,6 @@ const RegisterStudent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: "", text: "" });
 
     if (!validateForm()) return; // Stop if validation fails
 
@@ -57,7 +56,14 @@ const RegisterStudent = () => {
       const response = await api.post("/api/librarian/register-student", formData);
 
       if (response.data.success) {
-        setMessage({ type: "success", text: " Student registered successfully!" });
+        // SweetAlert for Success
+        Swal.fire({
+          title: "Success!",
+          text: "Student registered successfully!",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+
         setFormData({
           name: "",
           email: "",
@@ -69,15 +75,37 @@ const RegisterStudent = () => {
           branch: "",
         });
       } else {
-        setMessage({ type: "error", text: `⚠️ ${response.data.message}` });
+        // SweetAlert for Error
+        Swal.fire({
+          title: "Error!",
+          text: response.data.message || "An error occurred while registering the student.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       }
     } catch (error) {
+      // Handle errors from the server
       if (error.response) {
-        setMessage({ type: "error", text: `⚠️ ${error.response.data.message || "Server error occurred."}` });
+        Swal.fire({
+          title: "Error!",
+          text: error.response.data.message || "Server error occurred.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       } else if (error.request) {
-        setMessage({ type: "error", text: "⚠️ No response from server. Please check your internet connection." });
+        Swal.fire({
+          title: "Error!",
+          text: "No response from server. Please check your internet connection.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       } else {
-        setMessage({ type: "error", text: "⚠️ Something went wrong. Please try again." });
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong. Please try again.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       }
     }
 
@@ -88,14 +116,6 @@ const RegisterStudent = () => {
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100 p-4 sm:p-6">
       <div className="w-full max-w-lg md:max-w-2xl bg-white shadow-xl rounded-2xl p-6 sm:p-8 transition-all duration-300 hover:shadow-2xl">
         <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-6"> Register Student</h2>
-
-        {message.text && (
-          <p className={`p-4 text-center rounded-lg font-medium text-lg transition-all duration-300 
-            ${message.type === "success" ? "bg-green-100 text-green-800 border border-green-400 mb-1" 
-            : "bg-red-100 text-red-800 border border-red-400 mb-1"}`}>
-            {message.text}
-          </p>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           <InputField type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" error={errors.name} />

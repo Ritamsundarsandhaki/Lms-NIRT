@@ -8,6 +8,14 @@ const adminSchema = new mongoose.Schema({
   role: { type: String, enum: ["Admin"], default: "Admin" }, // Ensuring only "Admin" role
   resetOtp: { type: String }, // OTP for password reset
   otpExpiry: { type: Date }, 
+  resetOtpCount: {
+    type: Number,
+    default: 0,
+  },
+  resetOtpDate: {
+    type: Date,
+  },
+  
   createdAt: { type: Date, default: Date.now },
 });
 

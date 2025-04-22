@@ -30,7 +30,7 @@ const SearchBook = () => {
 
     try {
       const response = await api.get("/api/librarian/search-book", {
-        params: { bookId: searchQuery.bookId, title: searchQuery.title, page, limit: 5 },
+        params: { bookId: searchQuery.bookId, title: searchQuery.title, page, limit: 6 },
       });
 
       if (response.data.success) {
@@ -52,7 +52,7 @@ const SearchBook = () => {
     setMessage("");
 
     try {
-      const response = await api.get("/api/librarian/getallbooks", { params: { page, limit: 5 } });
+      const response = await api.get("/api/librarian/getallbooks", { params: { page, limit: 6 } });
 
       if (response.data.success) {
         setBooks(response.data.books);

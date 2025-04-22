@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import api from "../../components/Axios";
 import { motion } from "framer-motion";
+import Swal from "sweetalert2";
 
 const ReturnBook = () => {
   const [formData, setFormData] = useState({ fileNo: "", employeeId: "", bookIds: [""] });
   const [userType, setUserType] = useState("student");
-  const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e, index) => {
@@ -22,38 +22,50 @@ const ReturnBook = () => {
   const addBookField = () => setFormData({ ...formData, bookIds: [...formData.bookIds, ""] });
   const removeBookField = (index) => setFormData({ ...formData, bookIds: formData.bookIds.filter((_, i) => i !== index) });
 
+  const showAlert = (type, title, details = []) => {
+    Swal.fire({
+      icon: type,
+      title: title,
+      html: details.map(d => `<p>${d}</p>`).join(""),
+      confirmButtonText: "OK",
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage(null);
 
     if (!formData.fileNo.trim() && !formData.employeeId.trim()) {
-      setMessage({ type: "error", text: "File Number or Employee ID is required." });
+      showAlert("error", "File Number or Employee ID is required.");
       setLoading(false);
       return;
     }
     if (formData.bookIds.some((id) => id.trim().length < 5)) {
-      setMessage({ type: "error", text: "Each Book ID must be at least 5 digits." });
+      showAlert("error", "Each Book ID must be at least 5 digits.");
       setLoading(false);
       return;
     }
 
     try {
       const response = await api.post("/api/librarian/return-book", { ...formData, userType });
-      setMessage({
-        type: response.data.success ? "success" : "error",
-        text: response.data.message || "Books returned successfully!",
-        details: [
-          response.data.returnedBooks?.length ? `✅ Returned: ${response.data.returnedBooks.join(", ")}` : null,
-          response.data.notFoundBooks?.length ? `❌ Not Found: ${response.data.notFoundBooks.join(", ")}` : null,
-        ].filter(Boolean),
-      });
-      if (response.data.success) {
+      const { success, message, returnedBooks, notFoundBooks } = response.data;
+
+      showAlert(
+        success ? "success" : "error",
+        message || "Books returned successfully!",
+        [
+          returnedBooks?.length ? `✅ Returned: ${returnedBooks.join(", ")}` : null,
+          notFoundBooks?.length ? `❌ Not Found: ${notFoundBooks.join(", ")}` : null,
+        ].filter(Boolean)
+      );
+
+      if (success) {
         setFormData({ fileNo: "", employeeId: "", bookIds: [""] });
       }
     } catch (error) {
-      setMessage({ type: "error", text: error.response?.data?.message || "Server error. Please try again." });
+      showAlert("error", error.response?.data?.message || "Server error. Please try again.");
     }
+
     setLoading(false);
   };
 
@@ -61,7 +73,7 @@ const ReturnBook = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
       <div className="w-full max-w-lg bg-white shadow-lg rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-6">🔄 Return Book</h2>
-        {message && <Modal message={message} onClose={() => setMessage(null)} />}
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex space-x-4">
             <button type="button" onClick={() => setUserType("student")} className={`p-3 rounded-lg font-semibold transition-all ${userType === "student" ? "bg-blue-600 text-white" : "bg-gray-200"}`}>Student</button>
@@ -93,16 +105,6 @@ const InputField = ({ type, name, value, onChange, placeholder, required }) => (
 
 const LoadingSpinner = () => (
   <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="w-6 h-6 border-4 border-white border-t-transparent rounded-full"></motion.div>
-);
-
-const Modal = ({ message, onClose }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center">
-    <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-white p-6 rounded-lg shadow-lg text-center">
-      <p className={`text-lg font-semibold ${message.type === "success" ? "text-green-600" : "text-red-600"}`}>{message.text}</p>
-      {message.details?.map((detail, index) => <p key={index} className="text-sm mt-2">{detail}</p>)}
-      <button onClick={onClose} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md">OK</button>
-    </motion.div>
-  </div>
 );
 
 export default ReturnBook;

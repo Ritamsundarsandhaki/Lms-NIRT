@@ -21,6 +21,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "lucide-react": "^0.475.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
@@ -29,6 +30,8 @@
     "react-slick": "^0.30.3",
     "react-toastify": "^11.0.3",
     "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.18.0",
+    "sweetalert2-react-content": "^5.1.0",
     "tailwindcss": "^4.0.6"
   },
   "devDependencies": {

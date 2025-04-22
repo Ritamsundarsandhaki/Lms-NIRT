@@ -32,7 +32,7 @@ const FacultyRegister = () => {
 
       if (response.data.success) {
         setSuccess("Faculty registered successfully!");
-        setTimeout(() => navigate("/admin/all-faculties"), 2000);
+        setTimeout(() => navigate("/admin/all-faculty"), 1000);
       } else {
         throw new Error(response.data.message);
       }
