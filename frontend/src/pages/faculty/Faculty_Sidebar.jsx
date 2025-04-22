@@ -2,16 +2,16 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BookOpen, ClipboardList, User, LogOut, Menu } from "lucide-react";
 import axiosInstance from "../../components/Axios";
-
+import { useAuth } from "../../components/AuthContext";
 const FacultySidebar = ({ isOpen, toggleSidebar }) => {
+  const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.post("/api/faculty/logout");
-      localStorage.removeItem("authToken");
-      navigate("/");
+      await axiosInstance.post("/api/auth/logout");
+      logout();
     } catch (error) {
       console.error("Logout failed:", error);
     }

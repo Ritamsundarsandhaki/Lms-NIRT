@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate,NavLink } from "react-router-dom";
 import api from "../../components/Axios"; // Import Axios instance
+import { useAuth } from "../../components/AuthContext";
 import {
   BookOpen,
   UserPlus,
@@ -15,14 +16,14 @@ import {
 } from "lucide-react";
 
 const LibrarianSidebar = ({ isOpen, toggleSidebar }) => {
+  const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate(); // For redirecting after logout
 
   const handleLogout = async () => {
     try {
-      await api.post("/api/librarian/logout"); // Call logout API
-      localStorage.removeItem("token"); // Clear token from storage
-      navigate("/"); // Redirect to login page
+      await api.post("/api/auth/logout"); // Call logout API
+      logout();
     } catch (error) {
       console.error("Logout failed", error);
     }

@@ -6,6 +6,9 @@ import StudentHome from "./StudentHome";
 import MyBooks from "./MyBooks";
 import Profile from "../student/Profile";
 import BookHistory from "./BookHisory";
+import { FaBars } from "react-icons/fa";
+
+
 
 const StudentDashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -34,7 +37,7 @@ const StudentDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.post("api/student/logout");
+      await axiosInstance.post("api/auth/logout");
       localStorage.removeItem("authToken");
       navigate("/");
     } catch (error) {
@@ -50,7 +53,7 @@ const StudentDashboard = () => {
         className="md:hidden fixed top-4 left-4 z-50 px-3 py-2 bg-blue-600 text-white rounded-md shadow-md text-sm"
         onClick={() => setSidebarOpen(true)}
       >
-        Open Menu
+        <FaBars />
       </button>
 
       {/* Sidebar */}
@@ -88,16 +91,6 @@ const StudentDashboard = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 mb-6">
           <QuickActionCard title="View My Books" link="/student/my-books" color="from-purple-500 to-purple-700" />
           <QuickActionCard title="Check Book History" link="/student/book-history" color="from-orange-500 to-orange-700" />
-        </div>
-
-        {/* Logout Button */}
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={handleLogout}
-            className="px-3 py-2 rounded-md bg-red-600 text-white text-sm hover:bg-red-500 transition-all shadow-md"
-          >
-            Logout
-          </button>
         </div>
 
         {/* Main Content */}

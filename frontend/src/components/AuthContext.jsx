@@ -1,5 +1,6 @@
 // AuthContext.js
 import { createContext, useContext, useState, useEffect } from "react";
+import { redirect } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -19,6 +20,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("userType");
     setToken(null);
     setUserType(null);
+    redirect('/')
   };
 
   return (

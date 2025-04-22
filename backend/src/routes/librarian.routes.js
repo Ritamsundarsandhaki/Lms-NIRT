@@ -14,28 +14,32 @@ import {
   getAllBooks,
   uploadBooks,
   uploadStudents,
-  updateStudentProfile
+  updateStudentProfile,
+  updateBook,
+  getBookDetailsByBookId
 } from "../controllers/librarian.controller.js";
 import authMiddleware from "../middleware/librarian.middleware.js";
+import roleAuthMiddleware from "../middleware/roleAuth.middleware.js";
 import upload from "../middleware/upload.Middleware.js";
 
 const router = express.Router();
 
-router.post('/login',login)
-router.post('/logout',logout);
-router.post("/register-student",authMiddleware, registerStudent);
-router.post("/register-book",authMiddleware, registerBook);
-router.post('/updateStudent',authMiddleware,updateStudentProfile)
-router.post("/upload-books", upload.single("file"), uploadBooks);
-router.post("/upload-students", upload.single("file"), uploadStudents);
-router.post("/issue-book",authMiddleware, issueBook);
-router.post("/return-book",authMiddleware, returnBook);
-router.get("/search-student",authMiddleware, searchStudents);
-router.get("/search-book",authMiddleware, searchBooks);
-router.get('/profile',authMiddleware, profile);
-router.get('/dashboardData',authMiddleware,dashboardData)
-router.get('/getAllStudents',authMiddleware,getAllStudents);
-router.get('/getAllBooks',authMiddleware,getAllBooks)
+
+router.post("/register-student",roleAuthMiddleware("librarian"), registerStudent);
+router.post("/register-book",roleAuthMiddleware("librarian"), registerBook);
+router.put("/update-book/:copyId",roleAuthMiddleware("librarian"), updateBook);
+router.put('/update-student',roleAuthMiddleware("librarian"),updateStudentProfile)
+router.post("/upload-books",roleAuthMiddleware("librarian"), upload.single("file"), uploadBooks);
+router.post("/upload-students",roleAuthMiddleware("librarian"), upload.single("file"), uploadStudents);
+router.post("/issue-book",roleAuthMiddleware("librarian"), issueBook);
+router.post("/return-book",roleAuthMiddleware("librarian"), returnBook);
+router.get("/search-student",roleAuthMiddleware("librarian"), searchStudents);
+router.get("/search-book",roleAuthMiddleware("librarian"), searchBooks);
+router.get('/profile',roleAuthMiddleware("librarian"), profile);
+router.get('/dashboardData',roleAuthMiddleware("librarian"),dashboardData)
+router.get('/getAllStudents',roleAuthMiddleware("librarian"),getAllStudents);
+router.get('/getAllBooks',roleAuthMiddleware("librarian"),getAllBooks);
+router.get('/getBookById/:bookId',roleAuthMiddleware("librarian"),getBookDetailsByBookId)
 
 
 export default router;

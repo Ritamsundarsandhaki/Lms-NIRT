@@ -47,7 +47,7 @@ const BookHistory = () => {
           <tbody>
             {history.map((book, index) => (
               <tr key={index} className="text-center">
-                <td className="p-2 border">{book.title || "N/A"}</td>
+                <td className="p-2 border">{book.bookId || "N/A"}</td>
                 <td className="p-2 border">{new Date(book.issueDate).toLocaleDateString()}</td>
                 <td className="p-2 border">{book.returnDate !== "Not Returned" ? new Date(book.returnDate).toLocaleDateString() : "Not Returned"}</td>
                 <td

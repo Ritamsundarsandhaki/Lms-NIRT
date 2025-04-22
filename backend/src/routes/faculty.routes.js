@@ -7,13 +7,12 @@ import {
   logout 
 } from "../controllers/faculty.controller.js";
 import facultyAuthMiddleware from "../middleware/faculty.middleware.js";
+import roleAuthMiddleware from "../middleware/roleAuth.middleware.js";
 
 const router = express.Router();
 
-router.post("/login", facultyLogin);
-router.post("/logout", logout);
-router.get("/profile", facultyAuthMiddleware, getFacultyProfile);
-router.get("/issued-books", facultyAuthMiddleware, getIssuedBooks);
-router.get("/history", facultyAuthMiddleware, getFacultyHistory);
+router.get("/profile",roleAuthMiddleware("faculty"), getFacultyProfile);
+router.get("/issued-books",roleAuthMiddleware("faculty"), getIssuedBooks);
+router.get("/history", roleAuthMiddleware("faculty"), getFacultyHistory);
 
 export default router;

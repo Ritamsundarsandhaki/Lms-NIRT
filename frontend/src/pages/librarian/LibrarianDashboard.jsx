@@ -12,6 +12,8 @@ import Profile from "./Profile";
 import Libraian_Allstudent from "./Libraian_Allstudent";
 import Libraian_uplode_book from "./Libraian_uplode_book";
 import Libraian_uplode_student from "./Libraian_uplode_student";
+import UpdateStudent from "./UpdateStudent";
+import BookUpdate from "./BookUpdate";
 
 const LibrarianDashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -110,6 +112,8 @@ const LibrarianDashboard = () => {
               <Route path="/allstudent" element={<Libraian_Allstudent />} />
               <Route path="/books_uplodes" element={<Libraian_uplode_book />} />
               <Route path="/student_uplodes" element={<Libraian_uplode_student />} />
+              <Route path="/update_student/:fileNo" element={<UpdateStudent/>} />
+              <Route path="/update_book/:bookId" element={<BookUpdate/>} />
             </Routes>
           </div>
         )}

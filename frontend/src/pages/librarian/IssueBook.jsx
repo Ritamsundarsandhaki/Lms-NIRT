@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import api from "../../components/Axios";
 import { motion } from "framer-motion";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
 
 const IssueBook = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +13,6 @@ const IssueBook = () => {
     bookIds: [""],
     userType: "student",
   });
-  const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const toggleType = () => {
@@ -40,33 +43,33 @@ const IssueBook = () => {
       bookIds: formData.bookIds.filter((_, i) => i !== index),
     });
 
+  const showAlert = (type, text) => {
+    MySwal.fire({
+      icon: type,
+      title: type === "success" ? "Success ✅" : "Oops 😕",
+      html: `<pre style="text-align: left; white-space: pre-wrap;">${text}</pre>`,
+      confirmButtonColor: "#6366f1",
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage(null);
 
-    // Validation
     if (formData.userType === "student" && !formData.fileNo.trim()) {
-      setMessage({
-        type: "error",
-        text: "File Number is required for students.",
-      });
+      showAlert("error", "File Number is required for students.");
       setLoading(false);
       return;
     }
+
     if (formData.userType === "faculty" && !formData.employeeId.trim()) {
-      setMessage({
-        type: "error",
-        text: "Employee ID is required for faculty.",
-      });
+      showAlert("error", "Employee ID is required for faculty.");
       setLoading(false);
       return;
     }
+
     if (formData.bookIds.some((id) => id.trim().length < 5)) {
-      setMessage({
-        type: "error",
-        text: "Each Book ID must be at least 5 digits.",
-      });
+      showAlert("error", "Each Book ID must be at least 5 digits.");
       setLoading(false);
       return;
     }
@@ -78,9 +81,7 @@ const IssueBook = () => {
       let finalMessage = "";
 
       if (success) {
-        finalMessage += `✅ ${message}\nIssued Books: ${issuedBooks.join(
-          ", "
-        )}`;
+        finalMessage += `✅ ${message}\nIssued Books: ${issuedBooks.join(", ")}`;
       }
 
       if (failedBooks && failedBooks.length > 0) {
@@ -90,31 +91,17 @@ const IssueBook = () => {
         finalMessage += `\n\nFailed to Issue:\n${failedList}`;
       }
 
-      setMessage({
-        type: success ? "success" : "error",
-        text: finalMessage.trim(),
-      });
+      showAlert(success ? "success" : "error", finalMessage.trim());
     } catch (error) {
       if (error.response) {
-        // API responded with a status code
-        setMessage({
-          type: "error",
-          text: error.response.data.message || "Something went wrong.",
-        });
+        showAlert("error", error.response.data.message || "Something went wrong.");
       } else if (error.request) {
-        // No response received
-        setMessage({
-          type: "error",
-          text: "No response from the server. Please check your connection.",
-        });
+        showAlert("error", "No response from the server. Please check your connection.");
       } else {
-        // Something else happened
-        setMessage({
-          type: "error",
-          text: "An unexpected error occurred. Try again later.",
-        });
+        showAlert("error", "An unexpected error occurred. Try again later.");
       }
     }
+
     setLoading(false);
   };
 
@@ -134,9 +121,6 @@ const IssueBook = () => {
             ? "Switch to Faculty Issue"
             : "Switch to Student Issue"}
         </button>
-        {message && (
-          <Modal message={message} onClose={() => setMessage(null)} />
-        )}
         <form onSubmit={handleSubmit} className="space-y-5">
           {formData.userType === "student" ? (
             <InputField
@@ -216,31 +200,6 @@ const LoadingSpinner = () => (
     transition={{ repeat: Infinity, duration: 1 }}
     className="w-6 h-6 border-4 border-white border-t-transparent rounded-full"
   ></motion.div>
-);
-
-const Modal = ({ message, onClose }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center">
-    <motion.div
-      initial={{ scale: 0.8 }}
-      animate={{ scale: 1 }}
-      className="bg-white p-6 rounded-lg shadow-lg text-center"
-    >
-      <p
-        className={`text-base whitespace-pre-line font-medium ${
-          message.type === "success" ? "text-green-600" : "text-red-600"
-        }`}
-      >
-        {message.text}
-      </p>
-
-      <button
-        onClick={onClose}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md"
-      >
-        OK
-      </button>
-    </motion.div>
-  </div>
 );
 
 export default IssueBook;

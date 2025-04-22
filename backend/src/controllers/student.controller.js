@@ -2,7 +2,7 @@ import Student from "../models/student.models.js";
 import Book from "../models/book.models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import BookIssueLog from '../models/bookIssueLog.model.js'
 /**
  * @desc Student Login
  * @route POST /student/login
@@ -85,56 +85,122 @@ export const getStudentProfile = async (req, res) => {
  * @route GET /student/issued-books
  */
 
+// export const getIssuedBooks = async (req, res) => {
+//   try {
+//     const student = await Student.findById(req.user.id).populate("issuedBooks.bookId");
+
+//     if (!student) {
+//       return res.status(404).json({ success: false, message: "Student not found" });
+//     }
+
+//     // Filter books that are not returned
+//     const issuedBooks = student.issuedBooks
+//       .filter((book) => !book.returned) // Get only books that are not returned
+//       .map((book) => {
+//         let fine = 0;
+//         return {
+//           bookId: book,
+//           fine
+          
+//         };
+//       });
+
+//     res.status(200).json({ success: true, issuedBooks });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: "Server error", error: error.message });
+//   }
+// };
+
 export const getIssuedBooks = async (req, res) => {
   try {
-    const student = await Student.findById(req.user.id).populate("issuedBooks.bookId");
+    const today = new Date();
+    const finePerDay = 2; // ₹2 per day
+    const maxDaysAllowed = 14; // 2 weeks loan duration
 
-    if (!student) {
-      return res.status(404).json({ success: false, message: "Student not found" });
-    }
+    // Fetch unreturned books for current user (Student or Faculty)
+    const issueLogs = await BookIssueLog.find({
+      userId: req.user.id,
+      returned: false,
+    }).populate("bookCopy");
 
-    // Filter books that are not returned
-    const issuedBooks = student.issuedBooks
-      .filter((book) => !book.returned) // Get only books that are not returned
-      .map((book) => {
-        let fine = 0;
-        return {
-          bookId: book,
-          fine
-          
-        };
-      });
+    const issuedBooks = issueLogs.map((log) => {
+      const issueDate = new Date(log.issueDate);
+      const dueDate = new Date(issueDate);
+      dueDate.setDate(dueDate.getDate() + maxDaysAllowed);
+
+      let fine = 0;
+      if (today > dueDate) {
+        const overdueDays = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+        fine = overdueDays * finePerDay;
+      }
+
+      return {
+        bookId: {
+          bookId: log.bookCopy?.bookId,
+          returned: log.returned,
+          _id: log.bookCopy?._id,
+          issueDate: log.issueDate,
+        },
+        fine,
+      };
+    });
 
     res.status(200).json({ success: true, issuedBooks });
   } catch (error) {
+    console.error("Error in getIssuedBooks:", error);
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
-
-
 
 
 /**
  * @desc Get Student History of Issued & Returned Books
  * @route GET /student/history
  */
+// export const getStudentHistory = async (req, res) => {
+//   try {
+//     const student = await Student.findById(req.user.id).populate("issuedBooks.bookId");
+
+//     if (!student) {
+//       return res.status(404).json({ success: false, message: "Student not found" });
+//     }
+
+//     const history = student.issuedBooks.map((book) => ({
+//       title: book.bookId,
+//       issueDate: book.issueDate,
+//       returnDate: book.returnDate || "Not Returned",
+//       status: book.returned ? "Returned" : "Issued",
+//     }));
+
+//     res.status(200).json({ success: true, history });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: "Server error", error: error.message });
+//   }
+// };
+
 export const getStudentHistory = async (req, res) => {
   try {
-    const student = await Student.findById(req.user.id).populate("issuedBooks.bookId");
+    const issueLogs = await BookIssueLog.find({
+      userId: req.user.id,
+    }).populate({
+      path: "bookCopy",
+      populate: {
+        path: "book", // NOT bookId
+        model: "Book",
+      },
+    });
 
-    if (!student) {
-      return res.status(404).json({ success: false, message: "Student not found" });
-    }
-
-    const history = student.issuedBooks.map((book) => ({
-      title: book.bookId,
-      issueDate: book.issueDate,
-      returnDate: book.returnDate || "Not Returned",
-      status: book.returned ? "Returned" : "Issued",
+    const history = issueLogs.map((log) => ({
+      title: log.bookCopy?.book?.title || "Unknown Title",
+      bookId: log.bookCopy?.bookId || "N/A", // your custom bookId like BK001
+      issueDate: log.issueDate,
+      returnDate: log.returnDate || "Not Returned",
+      status: log.returned ? "Returned" : "Issued",
     }));
 
     res.status(200).json({ success: true, history });
   } catch (error) {
+    console.error("Error in getStudentHistory:", error);
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
