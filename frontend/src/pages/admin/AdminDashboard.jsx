@@ -84,6 +84,8 @@ const AdminDashboard = () => {
               <Route path="all-students" element={<AdminAllStudents />} />
               <Route path="all-faculty" element={<AdminAllFaculty />} />
               <Route path="server-health" element={<ServerHealth />} />
+             
+             
             </Routes>
           </div>
         )}

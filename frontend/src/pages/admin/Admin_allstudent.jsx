@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../components/Axios";
-import { Loader, XCircle, BookOpen, CheckCircle, X, Search } from "lucide-react";
+import { Loader, XCircle, Search } from "lucide-react";
 
 const AdminAllStudents = () => {
   const [students, setStudents] = useState([]);
@@ -12,7 +12,7 @@ const AdminAllStudents = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await axiosInstance.get("/api/admin/students");
+        const response = await axiosInstance.get("/api/admin/getAllStudents");
         setStudents(response.data.students);
         setFilteredStudents(response.data.students);
       } catch (err) {
@@ -84,7 +84,6 @@ const AdminAllStudents = () => {
                 <th className="p-4 border">Mobile</th>
                 <th className="p-4 border">Department</th>
                 <th className="p-4 border">Branch</th>
-                <th className="p-4 border">Issued Books</th>
               </tr>
             </thead>
             <tbody>
@@ -100,38 +99,12 @@ const AdminAllStudents = () => {
                       className="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm"
                     />
                   </td>
-
                   <td className="p-4 border font-semibold text-gray-900 dark:text-gray-200">{student.name}</td>
                   <td className="p-4 border text-gray-700 dark:text-gray-300">{student.email}</td>
                   <td className="p-4 border text-gray-700 dark:text-gray-300">{student.fileNo}</td>
                   <td className="p-4 border text-gray-700 dark:text-gray-300">{student.mobile}</td>
                   <td className="p-4 border text-gray-700 dark:text-gray-300">{student.department}</td>
                   <td className="p-4 border text-gray-700 dark:text-gray-300">{student.branch}</td>
-
-                  <td className="p-4 border">
-                    {student.issuedBooks.length > 0 ? (
-                      <ul className="list-disc pl-4 space-y-2">
-                        {student.issuedBooks.map((book) => (
-                          <li key={book._id} className="flex items-center">
-                            <BookOpen size={18} className="text-blue-600 mr-2" />
-                            <span className="font-semibold text-gray-700 dark:text-gray-300">
-                              {book.bookId}
-                            </span>
-                            <span className="ml-2 text-sm text-gray-500">
-                              {new Date(book.issueDate).toLocaleDateString()}
-                            </span>
-                            {book.returned ? (
-                              <CheckCircle size={18} className="text-green-500 ml-2" />
-                            ) : (
-                              <X size={18} className="text-red-500 ml-2" />
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <span className="text-gray-500">No Books Issued</span>
-                    )}
-                  </td>
                 </tr>
               ))}
             </tbody>

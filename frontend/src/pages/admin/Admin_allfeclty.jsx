@@ -10,9 +10,9 @@ const AdminAllFaculty = () => {
   useEffect(() => {
     const fetchFaculty = async () => {
       try {
-        const response = await axiosInstance.get("/api/admin/facultys");
+        const response = await axiosInstance.get("/api/admin/faculty-details");
         if (response.data.success) {
-          setFaculty(response.data.faculty);
+          setFaculty(response.data.facultyList); // 🔁 Updated here
         } else {
           throw new Error("Failed to fetch faculty members");
         }
@@ -28,9 +28,10 @@ const AdminAllFaculty = () => {
 
   return (
     <div className="max-w-5xl mx-auto mt-10 bg-gradient-to-br from-gray-100 via-white to-gray-200 dark:from-gray-800 dark:via-gray-900 dark:to-gray-950 shadow-lg p-8 rounded-2xl border border-gray-300 dark:border-gray-700">
-      <h2 className="text-3xl font-extrabold text-center text-indigo-700 dark:text-indigo-400">👨‍🏫 Faculty List</h2>
+      <h2 className="text-3xl font-extrabold text-center text-indigo-700 dark:text-indigo-400">
+        👨‍🏫 Faculty List
+      </h2>
 
-      {/* Error Handling */}
       {error && (
         <div className="flex items-center text-red-700 bg-red-200 border border-red-400 p-3 rounded-lg mt-4">
           <AlertTriangle size={20} className="mr-2" />
@@ -38,7 +39,6 @@ const AdminAllFaculty = () => {
         </div>
       )}
 
-      {/* Loading State */}
       {loading ? (
         <div className="flex justify-center mt-5">
           <Loader size={40} className="animate-spin text-indigo-600" />
@@ -54,7 +54,7 @@ const AdminAllFaculty = () => {
                 <th className="p-3">Employee ID</th>
                 <th className="p-3">Department</th>
                 <th className="p-3">Mobile</th>
-                <th className="p-3">Issued Books</th>
+        
               </tr>
             </thead>
             <tbody>
@@ -68,7 +68,7 @@ const AdminAllFaculty = () => {
                     <td className="p-3">{member.department}</td>
                     <td className="p-3">{member.mobile}</td>
                     <td className="p-3">
-                      {member.issuedBooks.length > 0 ? (
+                      {member.issuedBooks && member.issuedBooks.length > 0 ? (
                         <ul className="text-left">
                           {member.issuedBooks.map((book) => (
                             <li key={book._id} className="flex items-center space-x-2">
@@ -82,7 +82,7 @@ const AdminAllFaculty = () => {
                           ))}
                         </ul>
                       ) : (
-                        <span className="text-gray-500">No books issued</span>
+                        <span className="text-gray-500"></span>
                       )}
                     </td>
                   </tr>

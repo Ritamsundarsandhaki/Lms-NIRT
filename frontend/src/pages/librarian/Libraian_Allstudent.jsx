@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../components/Axios';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const Librarian_Allstudent = () => {
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -121,7 +125,9 @@ const Librarian_Allstudent = () => {
                         <td className="px-4 sm:px-6 py-3 text-gray-600">{student.department}</td>
                         <td className="px-4 sm:px-6 py-3">
                           <button
-                            onClick={() => setSelectedStudent(student)}
+                            onClick={() =>{
+                              navigate(`/librarian/studentAnalytics/${student._id}`); 
+                            }}
                             className="text-blue-600 hover:text-blue-800 font-medium"
                           >
                             Details

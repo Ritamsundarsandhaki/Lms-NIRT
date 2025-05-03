@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../../components/Axios"; // Import the Axios instance
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import axiosInstance from "../../components/Axios";
 
 // Custom Card Component
 const Card = ({ children }) => (
@@ -30,6 +31,7 @@ const Avatar = ({ src, alt, fallback }) => (
 function Profile() {
   const [librarian, setLibrarian] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -45,6 +47,10 @@ function Profile() {
 
     fetchProfile();
   }, []);
+
+  const handleChangePassword = () => {
+    navigate("/librarian/changePassword"); // Navigate to Change Password page
+  };
 
   if (loading) {
     return <Skeleton />;
@@ -70,6 +76,14 @@ function Profile() {
             {librarian.email || "No email available"}
           </p>
           <p className="text-gray-500 font-medium text-base">📚 Role: Librarian</p>
+
+          {/* Change Password Button */}
+          <button
+            onClick={handleChangePassword}
+            className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+          >
+            Change Password
+          </button>
         </div>
       </Card>
     </div>

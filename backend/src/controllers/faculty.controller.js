@@ -2,6 +2,7 @@ import Faculty from "../models/faculty.model.js";
 import Book from "../models/book.models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import BookIssueLog from '../models/bookIssueLog.model.js'
 
 /**
  * @desc Faculty Login
@@ -74,38 +75,70 @@ export const getFacultyProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: "Faculty not found" });
     }
 
-    res.status(200).json({ success: true, faculty });
+    // Fetch issued books (not returned yet)
+    const issuedBooks = await BookIssueLog.find({
+      userId: req.user.id,
+      userModel: "Faculty",
+      returned: false,
+    }).populate("bookCopy");
+
+    res.status(200).json({
+      success: true,
+      faculty: {
+        ...faculty._doc, // Spread faculty details
+        issuedBooks,     // Add issuedBooks array
+      },
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    console.error("Error fetching faculty profile:", error);
+    res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
 };
+
 
 /**
  * @desc Get Issued Books with Fine Calculation for Faculty
  * @route GET /faculty/issued-books
  */
+
 export const getIssuedBooks = async (req, res) => {
   try {
-    const faculty = await Faculty.findById(req.user.id).populate("issuedBooks.bookId");
+    const today = new Date();
+    const finePerDay = 2; // ₹2 per day
+    const maxDaysAllowed = 14; // 2 weeks loan duration
 
-    if (!faculty) {
-      return res.status(404).json({ success: false, message: "Faculty not found" });
-    }
+    // Fetch unreturned books for current user (Faculty)
+    const issueLogs = await BookIssueLog.find({
+      userId: req.user.id,
+      userModel: "Faculty",
+      returned: false,
+    }).populate("bookCopy");
 
-    // Filter books that are not returned
-    const issuedBooks = faculty.issuedBooks
-      .filter((book) => !book.returned)
-      .map((book) => {
-        let fine = 0;
+    const issuedBooks = issueLogs.map((log) => {
+      const issueDate = new Date(log.issueDate);
+      const dueDate = new Date(issueDate);
+      dueDate.setDate(dueDate.getDate() + maxDaysAllowed);
 
-        return {
-          bookId: book,
-          fine,
-        };
-      });
+      let fine = 0;
+      if (today > dueDate) {
+        const overdueDays = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+        fine = overdueDays * finePerDay;
+      }
+
+      return {
+        bookId: {
+          bookId: log.bookCopy?.bookId,
+          returned: log.returned,
+          _id: log.bookCopy?._id,
+          issueDate: log.issueDate,
+        },
+        fine,
+      };
+    });
 
     res.status(200).json({ success: true, issuedBooks });
   } catch (error) {
+    console.error("Error in getIssuedBooks:", error);
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
@@ -116,21 +149,28 @@ export const getIssuedBooks = async (req, res) => {
  */
 export const getFacultyHistory = async (req, res) => {
   try {
-    const faculty = await Faculty.findById(req.user.id).populate("issuedBooks.bookId");
+    const issueLogs = await BookIssueLog.find({
+      userId: req.user.id,
+    }).populate({
+      path: "bookCopy",
+      populate: {
+        path: "book", // NOT bookId directly, need book title
+        model: "Book",
+      },
+    });
 
-    if (!faculty) {
-      return res.status(404).json({ success: false, message: "Faculty not found" });
-    }
-
-    const history = faculty.issuedBooks.map((book) => ({
-      title: book.bookId,
-      issueDate: book.issueDate,
-      returnDate: book.returnDate || "Not Returned",
-      status: book.returned ? "Returned" : "Issued",
+    const history = issueLogs.map((log) => ({
+      title: log.bookCopy?.book?.title || "Unknown Title",
+      bookId: log.bookCopy?.bookId || "N/A", // your custom bookId like BK001
+      issueDate: log.issueDate,
+      returnDate: log.returnDate || "Not Returned",
+      status: log.returned ? "Returned" : "Issued",
     }));
 
     res.status(200).json({ success: true, history });
   } catch (error) {
+    console.error("Error in getFacultyHistory:", error);
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
+
