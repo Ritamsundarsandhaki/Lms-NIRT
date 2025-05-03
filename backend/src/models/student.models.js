@@ -46,14 +46,6 @@ const studentSchema = new mongoose.Schema(
     },
     resetOtp: { type: String }, // OTP for password reset
     otpExpiry: { type: Date }, 
-    issuedBooks: [
-      {
-        bookId: { type: String, require:true},
-        issueDate: { type: Date, default: Date.now },
-        returnDate: { type: Date },
-        returned: { type: Boolean, default: false },
-      },
-    ],
   },
   { timestamps: true } // ✅ Adds createdAt and updatedAt fields automatically
 );

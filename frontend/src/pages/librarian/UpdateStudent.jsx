@@ -3,10 +3,12 @@ import { useParams } from "react-router-dom";
 import api from "../../components/Axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { useNavigate } from "react-router-dom";
 
 const MySwal = withReactContent(Swal);
 
 const UpdateStudent = () => {
+   const navigate = useNavigate(); 
   const { fileNo } = useParams();
   const [studentData, setStudentData] = useState(null);
   const [errors, setErrors] = useState({});
@@ -72,6 +74,7 @@ const UpdateStudent = () => {
     try {
       const res = await api.put("/api/librarian/update-student", studentData);
       MySwal.fire("Success", res.data.message, "success");
+      navigate('/librarian/search-student')
     } catch (err) {
       MySwal.fire(
         "Error",

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import api from "../../components/Axios";
+import { FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 
 const SearchStudent = () => {
+  const navigate = useNavigate(); 
   const [searchQuery, setSearchQuery] = useState({ name: "", fileNo: "" });
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -84,18 +88,30 @@ const SearchStudent = () => {
 
         {/* Students List */}
         <div className="space-y-4">
-          {students.map((student, index) => (
-            <div
-              key={index}
-              onClick={() => setSelectedStudent(student)}
-              className="p-5 border border-gray-300 rounded-lg bg-white shadow-md hover:shadow-lg transition cursor-pointer"
-            >
-              <h3 className="text-lg font-semibold text-gray-900">👨‍🎓 {student.name}</h3>
-              <p className="text-gray-600">📧 {student.email}</p>
-              <p className="text-gray-600">📂 File No: {student.fileNo}</p>
-            </div>
-          ))}
-        </div>
+  {students.map((student, index) => (
+    <div
+      key={index}
+      onClick={() => setSelectedStudent(student)}
+      className="p-5 border border-gray-300 rounded-lg bg-white shadow-md hover:shadow-lg transition relative cursor-pointer" // 👉 added 'relative' here
+    >
+      {/* Edit Icon */}
+      <FaEdit
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent opening modal
+          navigate(`/librarian/update_student/${student.fileNo}`);
+        }}
+        className="absolute top-3 right-3 text-black-600 hover:text-black-800 text-2xl cursor-pointer"
+        title="Edit Student"
+      />
+
+      {/* Student Info */}
+      <h3 className="text-lg font-semibold text-gray-900">👨‍🎓 {student.name}</h3>
+      <p className="text-gray-600">📧 {student.email}</p>
+      <p className="text-gray-600">📂 File No: {student.fileNo}</p>
+    </div>
+  ))}
+</div>
+
 
         {/* Student Details Modal */}
         {selectedStudent && (

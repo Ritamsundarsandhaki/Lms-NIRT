@@ -1234,41 +1234,55 @@ export const searchBooks = async (req, res) => {
   }
 };
 
-
 export const getAllBooks = async (req, res) => {
   try {
-    const { title, author, page = 1, limit = 10 } = req.query;
+    const { title, author, bookId, page = 1, limit = 10 } = req.query;
 
-    // Build filter
-    let filter = {};
-    if (title) filter.title = { $regex: title, $options: "i" };
-    if (author) filter.author = { $regex: author, $options: "i" };
+    // Step 1: Build filter for Book collection
+    let bookFilter = {};
+    if (title) bookFilter.title = { $regex: title, $options: "i" };
+    if (author) bookFilter.author = { $regex: author, $options: "i" };
 
-    const skip = (page - 1) * limit;
+    // Step 2: Find books first (no pagination yet)
+    const books = await Book.find(bookFilter);
 
-    // Find books
-    const books = await Book.find(filter).skip(skip).limit(parseInt(limit));
-
-    // For each book, fetch its copies
+    // Step 3: For each book, find copies (filter by bookId if needed)
     const booksWithCopies = await Promise.all(
       books.map(async (book) => {
-        const copies = await BookCopy.find({ book: book._id });
+        let copyFilter = { book: book._id };
+        if (bookId) {
+          copyFilter.bookId = { $regex: bookId, $options: "i" };
+        }
+
+        const copies = await BookCopy.find(copyFilter);
+
+        // Skip books with no matching copies if filtering by bookId
+        if (bookId && copies.length === 0) return null;
+
         return {
           ...book.toObject(),
-          books: copies, // Attach all copies to this book
+          books: copies,
         };
       })
     );
 
-    const totalBooks = await Book.countDocuments(filter);
+    // Step 4: Filter out nulls (books that had no matching copies)
+    const filteredBooks = booksWithCopies.filter((b) => b !== null);
+
+    const totalBooks = filteredBooks.length;
+    const totalPages = Math.ceil(totalBooks / limit);
+    const currentPage = parseInt(page);
+
+    // Step 5: Paginate filtered result
+    const paginatedBooks = filteredBooks.slice((currentPage - 1) * limit, currentPage * limit);
 
     res.status(200).json({
       success: true,
-      books: booksWithCopies,
+      books: paginatedBooks,
       pagination: {
         totalBooks,
-        totalPages: Math.ceil(totalBooks / limit),
-        currentPage: parseInt(page),
+        totalPages,
+        currentPage,
         perPage: parseInt(limit),
       },
     });
@@ -1277,6 +1291,8 @@ export const getAllBooks = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
+
+
 
 export const getBookDetailsByBookId = async (req, res) => {
   try {
@@ -1360,5 +1376,346 @@ export const getAllStudents = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const getStudentFullDetails = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    // Fetch student basic information
+    const student = await Student.findById(studentId)
+      .select("-password") // Don't send password
+      .lean(); // Convert to plain object for easier handling
+
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    // Fetch issued books history (if stored in a separate BookIssueLog collection)
+    let issuedBooksHistory = [];
+    try {
+      issuedBooksHistory = await BookIssueLog.find({ userId: student._id }).sort({ issueDate: -1 });
+    } catch (err) {
+      console.log("No book issue history found separately.", err.message);
+    }
+
+    // Month-wise Analytics
+    let monthWiseAnalytics = [];
+    let typeWiseAnalytics = {};
+
+    // Loop through the issued books history to gather analytics
+    issuedBooksHistory.forEach(book => {
+      const issueDate = new Date(book.issueDate);
+      const yearMonth = `${issueDate.getFullYear()}-${issueDate.getMonth() + 1}`; // Format: "YYYY-MM"
+
+      // Add to month-wise analytics
+      if (!monthWiseAnalytics[yearMonth]) {
+        monthWiseAnalytics[yearMonth] = 0;
+      }
+      monthWiseAnalytics[yearMonth] += 1; // Increment the issue count for the month
+
+      // Add to type-wise analytics (assuming 'bookCategory' or similar field exists)
+      const bookType = book.details || "Uncategorized"; // Default to 'Uncategorized' if no category
+      if (!typeWiseAnalytics[bookType]) {
+        typeWiseAnalytics[bookType] = 0;
+      }
+      typeWiseAnalytics[bookType] += 1; // Increment the count for the book type
+    });
+
+    // Convert month-wise analytics into an array of objects for easier display
+    const monthWiseData = Object.keys(monthWiseAnalytics).map(key => ({
+      month: key,
+      issuedCount: monthWiseAnalytics[key]
+    }));
+
+    // Analytics based on issuedBooksHistory
+    let totalIssued = issuedBooksHistory.length;
+    let totalReturned = issuedBooksHistory.filter(book => book.returned).length;
+    let totalPending = totalIssued - totalReturned;
+
+    const analytics = {
+      totalIssued,
+      totalReturned,
+      totalPending,
+      monthWiseData,
+      typeWiseAnalytics,
+    };
+
+    res.status(200).json({
+      success: true,
+      student,
+      issuedBooksHistory,
+      analytics,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+export const getAllFaculty = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      employeeId,
+      department,
+      mobile,
+      page = 1,
+      limit = 10,
+    } = req.query; // Get filter and pagination parameters
+
+    // Build filter object based on query parameters
+    let filter = {};
+
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    }
+    if (email) {
+      filter.email = { $regex: email, $options: "i" };
+    }
+    if (employeeId) {
+      filter.employeeId = { $regex: employeeId, $options: "i" };
+    }
+    if (department) {
+      filter.department = { $regex: department, $options: "i" };
+    }
+    if (mobile) {
+      filter.mobile = { $regex: mobile, $options: "i" };
+    }
+
+    // Pagination setup
+    const skip = (page - 1) * limit;
+
+    // Fetch faculty data with applied filters and pagination
+    const facultyList = await Faculty.find(filter)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .select("-password") // Do not send the password
+      .sort({ createdAt: -1 }); // Latest created first (optional)
+
+    // Get total count for pagination
+    const totalFaculty = await Faculty.countDocuments(filter);
+
+    res.status(200).json({
+      success: true,
+      facultyList,
+      pagination: {
+        totalFaculty,
+        totalPages: Math.ceil(totalFaculty / limit),
+        currentPage: parseInt(page),
+        perPage: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+export const getFacultyFullDetails = async (req, res) => {
+  try {
+    const { facultyId } = req.params;
+
+    // Fetch faculty basic information
+    const faculty = await Faculty.findById(facultyId)
+      .select("-password") // Don't send password
+      .lean(); // Convert to plain object for easier handling
+
+    if (!faculty) {
+      return res.status(404).json({ success: false, message: "Faculty not found" });
+    }
+
+    // Fetch issued books history
+    let issuedBooksHistory = [];
+    try {
+      issuedBooksHistory = await BookIssueLog.find({ userId: faculty._id }).sort({ issueDate: -1 });
+    } catch (err) {
+      console.log("No book issue history found separately for faculty.", err.message);
+    }
+
+    // Month-wise and Type-wise Analytics
+    let monthWiseAnalytics = {};
+    let typeWiseAnalytics = {};
+
+    issuedBooksHistory.forEach(book => {
+      const issueDate = new Date(book.issueDate);
+      const yearMonth = `${issueDate.getFullYear()}-${issueDate.getMonth() + 1}`; // Format: "YYYY-MM"
+
+      // Month-wise counting
+      if (!monthWiseAnalytics[yearMonth]) {
+        monthWiseAnalytics[yearMonth] = 0;
+      }
+      monthWiseAnalytics[yearMonth] += 1;
+
+      // Type-wise counting
+      const bookType = book.details || "Uncategorized"; // Adjust this according to your schema
+      if (!typeWiseAnalytics[bookType]) {
+        typeWiseAnalytics[bookType] = 0;
+      }
+      typeWiseAnalytics[bookType] += 1;
+    });
+
+    const monthWiseData = Object.keys(monthWiseAnalytics).map(key => ({
+      month: key,
+      issuedCount: monthWiseAnalytics[key],
+    }));
+
+    // Basic Analytics
+    const totalIssued = issuedBooksHistory.length;
+    const totalReturned = issuedBooksHistory.filter(book => book.returned).length;
+    const totalPending = totalIssued - totalReturned;
+
+    const analytics = {
+      totalIssued,
+      totalReturned,
+      totalPending,
+      monthWiseData,
+      typeWiseAnalytics,
+    };
+
+    res.status(200).json({
+      success: true,
+      faculty,
+      issuedBooksHistory,
+      analytics,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+export const changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const librarianId = req.user.id; // Assuming you have librarian's ID in req.user (from auth middleware)
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: "Old and new passwords are required" });
+    }
+
+    // Find the librarian by ID
+    const librarian = await Librarian.findById(librarianId);
+    if (!librarian) {
+      return res.status(404).json({ success: false, message: "Librarian not found" });
+    }
+
+    // Check if old password matches
+    const isMatch = await bcrypt.compare(oldPassword, librarian.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Old password is incorrect" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the password
+    librarian.password = hashedPassword;
+    await librarian.save();
+
+    res.status(200).json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const bookTraking = async (req, res) => {
+  try {
+    const { bookId } = req.params; // bookId is like 'AA-000003'
+
+    // 1. Find BookCopy by bookId (custom ID)
+    const bookCopy = await BookCopy.findOne({ bookId }).populate('book');
+    if (!bookCopy) {
+      return res.status(404).json({ success: false, message: "Book copy not found" });
+    }
+
+    const book = bookCopy.book;
+    if (!book) {
+      return res.status(404).json({ success: false, message: "Book metadata not found for this copy" });
+    }
+
+    // 2. Fetch all issue history for this book copy
+    const issueHistory = await BookIssueLog.find({ bookId })
+      .populate("userId", "name email") 
+      .populate("librarianId", "name email") 
+      .populate("bookCopy", "bookId issued") 
+      .sort({ issueDate: -1 })
+      .lean();
+
+    // 3. Prepare analytics
+    const totalIssued = issueHistory.length;
+    const totalReturned = issueHistory.filter(issue => issue.returned).length;
+    const totalPending = totalIssued - totalReturned;
+
+    const monthWiseAnalytics = {};
+    issueHistory.forEach(issue => {
+      const issueDate = new Date(issue.issueDate);
+      const yearMonth = `${issueDate.getFullYear()}-${String(issueDate.getMonth() + 1).padStart(2, '0')}`;
+      if (!monthWiseAnalytics[yearMonth]) {
+        monthWiseAnalytics[yearMonth] = 0;
+      }
+      monthWiseAnalytics[yearMonth]++;
+    });
+
+    const monthWiseData = Object.keys(monthWiseAnalytics).map(month => ({
+      month,
+      issuedCount: monthWiseAnalytics[month],
+    }));
+
+    // 4. Currently issued copy
+    const currentlyIssuedCopies = issueHistory
+      .filter(issue => !issue.returned)
+      .map(issue => ({
+        copyId: issue.bookCopy?._id,
+        bookId: issue.bookCopy?.bookId,
+        issuedTo: {
+          name: issue.userId?.name,
+          email: issue.userId?.email,
+        },
+        issuedByLibrarian: {
+          name: issue.librarianId?.name,
+          email: issue.librarianId?.email,
+        },
+        issueDate: issue.issueDate,
+      }));
+
+    // 5. Send Response
+    res.status(200).json({
+      success: true,
+      book,
+      issueHistory,
+      analytics: {
+        totalIssued,
+        totalReturned,
+        totalPending,
+        monthWiseData,
+        currentlyIssuedCopies,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error in bookTraking:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };

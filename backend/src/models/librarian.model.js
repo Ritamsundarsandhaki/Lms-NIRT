@@ -18,15 +18,6 @@ const librarianSchema = new mongoose.Schema({
   resetOtpDate: {
     type: Date,
   },
-  
-  // ✅ History of actions
-  history: [
-    {
-      action: { type: String, required: true }, // e.g., "Added Book", "Issued Book", etc.
-      details: { type: String }, // Optional details about the action
-      timestamp: { type: Date, default: Date.now } // Action timestamp
-    }
-  ],
 }, { timestamps: true });
 
 

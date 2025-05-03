@@ -14,6 +14,12 @@ import Libraian_uplode_book from "./Libraian_uplode_book";
 import Libraian_uplode_student from "./Libraian_uplode_student";
 import UpdateStudent from "./UpdateStudent";
 import BookUpdate from "./BookUpdate";
+import StudentAnalytics from "./StudentAnalytics";
+import AllStaff from "./All_stafe";
+import FacultyAnalytics from "./FacultyAnalytics";
+import ChangePassword from "./ChangePassword";
+import BookCopyAnalytics from "./BookCopyAnalytics";
+
 
 const LibrarianDashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -114,6 +120,11 @@ const LibrarianDashboard = () => {
               <Route path="/student_uplodes" element={<Libraian_uplode_student />} />
               <Route path="/update_student/:fileNo" element={<UpdateStudent/>} />
               <Route path="/update_book/:bookId" element={<BookUpdate/>} />
+              <Route path="/studentAnalytics/:studentId" element={<StudentAnalytics/>}/>
+              <Route path="/all-faculty" element={<AllStaff/>}/>
+              <Route path="/all-faculty/:facultyId" element={<FacultyAnalytics/>}/>
+              <Route path="/changePassword" element={<ChangePassword/>}/>
+              <Route path="/bookCopyAnalict/:bookId" element={<BookCopyAnalytics/>}/>
             </Routes>
           </div>
         )}

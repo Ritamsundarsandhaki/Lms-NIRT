@@ -37,15 +37,6 @@ const facultySchema = new mongoose.Schema(
   resetOtpDate: {
     type: Date,
   },
-  
-    issuedBooks: [
-      {
-        bookId: { type: String, required: true },
-        issueDate: { type: Date, default: Date.now },
-        returnDate: { type: Date },
-        returned: { type: Boolean, default: false },
-      },
-    ],
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt fields
 );

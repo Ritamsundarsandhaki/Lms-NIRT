@@ -58,6 +58,7 @@ const LibrarianSidebar = ({ isOpen, toggleSidebar }) => {
         <SidebarLink to="/librarian/search-student" label="Search Student" icon={<Search size={22} />} isOpen={isOpen} location={location} />
         <SidebarLink to="/librarian/profile" label="Profile" icon={<User size={22} />} isOpen={isOpen} location={location} />
         <SidebarLink to="/librarian/allstudent" label="All Student" icon={<User size={22} />} isOpen={isOpen} location={location} />
+        <SidebarLink to="/librarian/all-faculty" label="All Faculty" icon={<User size={22} />} isOpen={isOpen} location={location} />
         <SidebarLink to="/librarian/books_uplodes" label="Upload Books" icon={<BookUp size={22} />} isOpen={isOpen} location={location} />
         <SidebarLink to="/librarian/student_uplodes" label="Upload Student" icon={<Upload size={22} />} isOpen={isOpen} location={location} />
 

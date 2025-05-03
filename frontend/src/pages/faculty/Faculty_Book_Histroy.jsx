@@ -34,6 +34,7 @@ const FacultyBookHistory = () => {
             <thead>
               <tr className="bg-gray-200">
                 <th className="border p-2">Title</th>
+                <th className="border p-2">BookId</th>
                 <th className="border p-2">Issue Date</th>
                 <th className="border p-2">Return Date</th>
                 <th className="border p-2">Status</th>
@@ -43,6 +44,7 @@ const FacultyBookHistory = () => {
               {history.map((book, index) => (
                 <tr key={index} className="text-center border">
                   <td className="border p-2">{book.title}</td>
+                  <td className="border p-2">{book.bookId}</td>
                   <td className="border p-2">{new Date(book.issueDate).toLocaleDateString()}</td>
                   <td className="border p-2">
                     {book.returnDate !== "Not Returned" ? new Date(book.returnDate).toLocaleDateString() : "Not Returned"}
