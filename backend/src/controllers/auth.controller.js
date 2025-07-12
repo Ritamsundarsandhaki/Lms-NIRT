@@ -85,7 +85,7 @@ export const login = async (req, res) => {
       success: true,
       message: "Login successful",
       type:userType,
-      token:"jdejknekjkndonbdjodhieohbrjdxbnjdkxbeidb",
+      token:token,
     });
 
   } catch (error) {

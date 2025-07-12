@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../../components/Axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { useNavigate } from "react-router-dom";
 
 const MySwal = withReactContent(Swal);
 
 const UpdateStudent = () => {
-   const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { fileNo } = useParams();
   const [studentData, setStudentData] = useState(null);
   const [errors, setErrors] = useState({});
@@ -74,7 +73,7 @@ const UpdateStudent = () => {
     try {
       const res = await api.put("/api/librarian/update-student", studentData);
       MySwal.fire("Success", res.data.message, "success");
-      navigate('/librarian/search-student')
+      navigate("/librarian/search-student");
     } catch (err) {
       MySwal.fire(
         "Error",
@@ -95,6 +94,7 @@ const UpdateStudent = () => {
         {studentData ? (
           <div className="space-y-4 sm:space-y-5">
             <InputField
+              label="Full Name"
               name="name"
               value={studentData.name}
               onChange={handleChange}
@@ -102,6 +102,7 @@ const UpdateStudent = () => {
               error={errors.name}
             />
             <InputField
+              label="Email"
               name="email"
               value={studentData.email}
               onChange={handleChange}
@@ -109,6 +110,7 @@ const UpdateStudent = () => {
               error={errors.email}
             />
             <InputField
+              label="Parent Name"
               name="parentName"
               value={studentData.parentName}
               onChange={handleChange}
@@ -116,6 +118,7 @@ const UpdateStudent = () => {
               error={errors.parentName}
             />
             <InputField
+              label="Mobile"
               name="mobile"
               value={studentData.mobile}
               onChange={handleChange}
@@ -123,6 +126,7 @@ const UpdateStudent = () => {
               error={errors.mobile}
             />
             <InputField
+              label="Department"
               name="department"
               value={studentData.department}
               onChange={handleChange}
@@ -131,17 +135,24 @@ const UpdateStudent = () => {
             />
 
             {/* Branch Dropdown */}
-            <div className="relative">
+            <div className="space-y-1">
+              <label
+                htmlFor="branch"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Branch
+              </label>
               <select
+                id="branch"
                 name="branch"
                 value={studentData.branch}
                 onChange={handleChange}
                 className={`w-full p-3 border rounded-lg bg-gray-50 text-gray-900 transition-all duration-300 
-                            ${
-                              errors.branch
-                                ? "border-red-500 focus:ring-red-400"
-                                : "border-gray-300 focus:ring-indigo-400 hover:bg-gray-100"
-                            }`}
+                  ${
+                    errors.branch
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-300 focus:ring-indigo-400 hover:bg-gray-100"
+                  }`}
               >
                 <option value="">Select Branch</option>
                 {branches.map((branch) => (
@@ -151,11 +162,11 @@ const UpdateStudent = () => {
                 ))}
               </select>
               {errors.branch && (
-                <p className="text-red-500 text-sm mt-1">{errors.branch}</p>
+                <p className="text-red-500 text-sm">{errors.branch}</p>
               )}
             </div>
 
-            {/* Submit */}
+            {/* Submit Button */}
             <button
               onClick={handleUpdate}
               disabled={loading}
@@ -174,27 +185,31 @@ const UpdateStudent = () => {
   );
 };
 
-// Reusable Input Field Component
-const InputField = ({ name, value, onChange, placeholder, error }) => (
-  <div>
+// Reusable Input Field with Label
+const InputField = ({ name, value, onChange, placeholder, error, label }) => (
+  <div className="space-y-1">
+    <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+      {label}
+    </label>
     <input
+      id={name}
       type="text"
       name={name}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
       className={`w-full p-3 border rounded-lg bg-gray-50 text-gray-900 transition-all duration-300 
-                 ${
-                   error
-                     ? "border-red-500 focus:ring-red-400"
-                     : "border-gray-300 focus:ring-indigo-400 hover:bg-gray-100 hover:shadow-md"
-                 } text-sm sm:text-base`}
+        ${
+          error
+            ? "border-red-500 focus:ring-red-400"
+            : "border-gray-300 focus:ring-indigo-400 hover:bg-gray-100 hover:shadow-md"
+        } text-sm sm:text-base`}
     />
-    {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+    {error && <p className="text-red-500 text-sm">{error}</p>}
   </div>
 );
 
-// Spinner
+// Loading Spinner
 const LoadingSpinner = () => (
   <svg
     className="w-6 h-6 animate-spin text-white"

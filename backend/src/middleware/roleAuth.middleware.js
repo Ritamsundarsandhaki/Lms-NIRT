@@ -16,14 +16,16 @@ const modelMap = {
 const roleAuthMiddleware = (role) => {
   return async (req, res, next) => {
     try {
-      const token = req.cookies.jwt;
-
-      if (!token) {
+      // Get token from Authorization header
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return res.status(401).json({
           success: false,
-          message: "Access denied. No token provided.",
+          message: "Access denied. No token provided in header.",
         });
       }
+
+      const token = authHeader.split(" ")[1];
 
       // Decode JWT
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -49,7 +51,7 @@ const roleAuthMiddleware = (role) => {
       // Attach user and role to request
       req.user = user;
       req.role = role;
-      req.userId = decoded.id
+      req.userId = decoded.id;
       next();
     } catch (error) {
       const isExpired = error.name === "TokenExpiredError";

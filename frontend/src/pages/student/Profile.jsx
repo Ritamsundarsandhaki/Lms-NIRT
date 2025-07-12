@@ -26,9 +26,9 @@ const Profile = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+    <div className="p-6 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Profile</h1>
-      <p className="text-gray-600 dark:text-gray-300">Manage your account details.</p>
+      <p className="text-gray-600">Manage your account details.</p>
 
       {loading ? (
         <p className="text-center text-lg">Loading...</p>
@@ -39,39 +39,39 @@ const Profile = () => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="font-semibold">Name:</p>
-              <p className="text-gray-700 dark:text-gray-300">{student.name}</p>
+              <p className="text-gray-700">{student.name}</p>
             </div>
             <div>
               <p className="font-semibold">Email:</p>
-              <p className="text-gray-700 dark:text-gray-300">{student.email}</p>
+              <p className="text-gray-700">{student.email}</p>
             </div>
             <div>
               <p className="font-semibold">File No:</p>
-              <p className="text-gray-700 dark:text-gray-300">{student.fileNo}</p>
+              <p className="text-gray-700">{student.fileNo}</p>
             </div>
             <div>
               <p className="font-semibold">Parent Name:</p>
-              <p className="text-gray-700 dark:text-gray-300">{student.parentName}</p>
+              <p className="text-gray-700">{student.parentName}</p>
             </div>
             <div>
               <p className="font-semibold">Mobile:</p>
-              <p className="text-gray-700 dark:text-gray-300">{student.mobile}</p>
+              <p className="text-gray-700">{student.mobile}</p>
             </div>
             <div>
               <p className="font-semibold">Department:</p>
-              <p className="text-gray-700 dark:text-gray-300">{student.department}</p>
+              <p className="text-gray-700">{student.department}</p>
             </div>
             <div>
               <p className="font-semibold">Branch:</p>
-              <p className="text-gray-700 dark:text-gray-300">{student.branch}</p>
+              <p className="text-gray-700">{student.branch}</p>
             </div>
           </div>
 
           {/* Issued Books Section */}
           <h2 className="text-xl font-bold mt-6 mb-2">Issued Books</h2>
-          <table className="w-full border-collapse border border-gray-300 dark:border-gray-700">
+          <table className="w-full border-collapse border border-gray-300">
             <thead>
-              <tr className="bg-gray-200 dark:bg-gray-700">
+              <tr className="bg-gray-200">
                 <th className="p-2 border">Book ID</th>
                 <th className="p-2 border">Issue Date</th>
                 <th className="p-2 border">Return Date</th>
