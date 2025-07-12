@@ -48,11 +48,11 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen transition-all duration-300 bg-gray-100 text-gray-900">
+    <div className="flex">
       
       {/* Mobile Sidebar Toggle */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 px-3 py-2 bg-blue-600 text-white rounded-md shadow-md text-sm"
+        className="md:hidden fixed top-4 left-4 z-50 px-6 py-3 bg-blue-600 text-white rounded-md shadow-md text-m"
         onClick={() => setSidebarOpen(true)}
       >
         <FaBars />
@@ -66,7 +66,7 @@ const StudentDashboard = () => {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 px-4 py-6 md:ml-64 transition-all duration-300">
+      <div className="flex-1 px-4 py-6  transition-all duration-300">
 
         {/* Only show greeting, stats, quick actions on dashboard route */}
         {isDashboardRoute && (
@@ -101,7 +101,7 @@ const StudentDashboard = () => {
         )}
 
         {/* Route-based Views */}
-        <div className="bg-white shadow-md rounded-md p-6">
+        <div className="">
           <Routes>
             <Route path="/dashboard" element={<StudentHome />} />
             <Route path="/my-books" element={<MyBooks />} />

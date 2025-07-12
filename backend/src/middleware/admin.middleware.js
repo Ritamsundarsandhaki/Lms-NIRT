@@ -3,25 +3,27 @@ import Admin from "../models/admin.model.js";
 
 const adminAuthMiddleware = async (req, res, next) => {
   try {
-    // Get token from cookies
-    const token = req.cookies.jwt;
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    console.log(authHeader)
 
-    if (!token) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ success: false, message: "Access denied. No token provided." });
     }
+
+    const token = authHeader.split(" ")[1]; // Extract token after "Bearer"
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Check if user exists and is an admin
+    // Check if admin exists
     const admin = await Admin.findById(decoded.id);
     if (!admin) {
       return res.status(401).json({ success: false, message: "Invalid token or admin does not exist." });
     }
 
-    // Attach admin details to request object
-    req.admin = admin;
-    next(); // Proceed to the next middleware/controller
+    req.admin = admin; // Attach admin to request
+    next(); // Proceed to next middleware
   } catch (error) {
     return res.status(401).json({ success: false, message: "Unauthorized: Invalid or expired token." });
   }

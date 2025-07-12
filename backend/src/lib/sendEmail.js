@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY); // Add this key to your .
 export const sendEmail = async (email, subject, otp) => {
   try {
     const data = await resend.emails.send({
-      from: `"NIRT Library (No Reply)" <noreply@yourdomain.com>`, // Must match your verified domain
+      from: `"NIRT Library (No Reply)" <noreply@nirtlibrary.in>`, // Must match your verified domain
       to: email,
       subject: subject,
       html: `
@@ -63,7 +63,7 @@ export const sendEmail = async (email, subject, otp) => {
                 .cta-button {
                     display: inline-block;
                     background-color: #1976d2;
-                    color: #fff;
+                    color: #fbfcf7;
                     padding: 12px 20px;
                     text-decoration: none;
                     border-radius: 4px;
@@ -80,7 +80,7 @@ export const sendEmail = async (email, subject, otp) => {
         </head>
         <body>
             <div class="container">
-                <img class="logo" src="https://yourdomain.com/logo.png" alt="Library Logo">
+                <img class="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuQ_m9SDnGfnOjET4Lb9qQJHytCTSAzWZW3Q&s" alt="Library Logo">
                 <h2 class="title">🔐 Password Reset Request</h2>
                 <p class="message">
                     Hello, <br> You have requested to reset your password. Use the OTP below to proceed.

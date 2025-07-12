@@ -24,8 +24,7 @@ let frontend = process.env.FRONTEND_URL
 console.log(frontend)
 app.use(
   cors({
-    origin: frontend,
-    credentials: true,
+    origin:"*",
   })
 );
 app.use(bodyParser.json());
@@ -34,9 +33,17 @@ app.use(cookieParser());
 app.use(morgan("dev")); 
 
 // ✅ Routes
+// app.get("/", (req, res) => {
+//   res.json({ message: "Server Connected and working properly 🚀" });
+// });
+
+let totalRequests = 0;
+
 app.get("/", (req, res) => {
-  res.json({ message: "Server Connected and working properly 🚀" });
+  res.send("server start properly")
 });
+
+
 app.use("/api/admin", adminRouter);
 app.use("/api/librarian", librarianRouter);
 app.use("/api/student", studentRouter);
@@ -76,7 +83,7 @@ const createDummyAdmin = async () => {
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, async () => {
+app.listen(PORT,'0.0.0.0', async () => {
   console.log(`🚀 Server Started on port ${PORT}`);
   await connectDB(); // Ensure DB is connected first
   await createDummyAdmin(); // Create a dummy admin if needed

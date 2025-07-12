@@ -145,7 +145,7 @@ const BookRegistration = () => {
           x = 10;
           y += 30;
         }
-        if (count % 10 === 0) {
+        if (count % 27 === 0) {
           doc.addPage();
           x = 10;
           y = 10;

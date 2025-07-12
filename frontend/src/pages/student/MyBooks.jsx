@@ -31,9 +31,9 @@ const MyBooks = () => {
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg w-full max-w-4xl mx-auto">
+    <div className="p-6 bg-white  shadow-lg rounded-lg w-full max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-center">📚 My Issued Books</h1>
-      <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+      <p className="text-black-700 text-center mb-6">
         View the books you've borrowed along with return info and any fines.
       </p>
 
@@ -59,7 +59,7 @@ const MyBooks = () => {
           {issuedBooks.map((book, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-6 shadow-md hover:shadow-xl transition-all"
+              className="bg-white border  border-gray-600 rounded-xl p-6 shadow-md hover:shadow-xl transition-all"
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">{book.bookId?.bookId || "N/A"}</h3>
@@ -72,7 +72,7 @@ const MyBooks = () => {
                 </p>
               </div>
 
-              <div className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+              <div className="text-sm text-gray-700 mt-2">
                 <p>
                   <strong>Issue Date: </strong>
                   {new Date(book.bookId.issueDate).toLocaleDateString()}
